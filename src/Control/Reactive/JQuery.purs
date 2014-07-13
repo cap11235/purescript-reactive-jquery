@@ -1,6 +1,6 @@
 module Control.Reactive.JQuery where
 
-import Prelude (($), (<$>), (-), (>), (+), flip, return)
+import Prelude (($), (<$>), (-), (>), (+), flip, return, unit)
 import Prelude.Unsafe (unsafeIndex)
 import Control.Monad
 import Control.Monad.Eff
@@ -32,7 +32,7 @@ bindValueTwoWay ref input = do
   -- Subscribe for updates on the RVar
   subscribe ref $ \newValue -> do
     setValue newValue input
-    return {}
+    return unit
 
 -- |
 -- Bind the checked property of a checkbox to the specified RVar
@@ -52,7 +52,7 @@ bindCheckedTwoWay ref checkbox = do
   -- Subscribe for updates on the RVar
   subscribe ref $ \newValue -> do
     setProp "checked" newValue checkbox
-    return {}
+    return unit
 
 -- |
 -- Bind the text content of an element to the specified computed value
@@ -65,7 +65,7 @@ bindTextOneWay comp el = do
   -- Subscribe for updates on the computed value
   subscribeComputed comp $ \text -> do
     setText text el
-    return {}
+    return unit
 
 -- |
 -- Bind an RArray
@@ -97,7 +97,7 @@ bindArray arr el create = unsafeRunRef $ do
                        , subscription: subscription
                        , index: indexR }
       appendAtIndex index child el
-      return {}
+      return unit
     Updated a index -> do
       { el = old, subscription = Subscription unsubscribe, index = indexR } <- flip unsafeIndex index <$> readRef elements
       unsubscribe
@@ -110,7 +110,7 @@ bindArray arr el create = unsafeRunRef $ do
                        , index: indexR }
       appendAtIndex index new el
 
-      return {}
+      return unit
     Removed index -> do
       { el = child, subscription = Subscription unsubscribe } <- flip unsafeIndex index <$> readRef elements
       unsubscribe
@@ -118,5 +118,5 @@ bindArray arr el create = unsafeRunRef $ do
       modifyRef elements (deleteAt index 1)
       others <- readRef elements
       traverse (\{ index = indexR } -> modifyRVar indexR (\i -> if i > index then i - 1 else i)) others
-      return {}
+      return unit
 

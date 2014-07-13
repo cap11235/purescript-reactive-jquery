@@ -13,7 +13,6 @@ import Data.Maybe
 import Data.Monoid
 import Data.Traversable
 import Debug.Trace
-import Global (parseInt)
 
 main = do
   personDemo
